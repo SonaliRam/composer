@@ -1,202 +1,809 @@
-<!doctype html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8" />
-    <title>Banner </title>
+<style>
+:root {
+  --ui-bg: var(--color-background-primary, #ffffff);
+  --ui-bg-soft: var(--color-background-secondary, #f7f7f8);
+  --ui-bg-soft-2: var(--color-background-tertiary, #efeff1);
+  --ui-text: var(--color-text-primary, #111111);
+  --ui-text-soft: var(--color-text-secondary, #4f5660);
+  --ui-text-muted: var(--color-text-tertiary, #757b84);
+  --ui-border: var(--color-border-secondary, #d7d9dd);
+  --ui-border-soft: var(--color-border-tertiary, #e6e8ec);
+  --ui-radius: var(--border-radius-lg, 14px);
+  --ui-radius-sm: var(--border-radius-md, 10px);
+  --ui-shadow: 0 12px 30px rgba(16, 24, 40, 0.08);
+  --ui-brand: #0a2849;
+}
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #f5f5f5;
-            padding: 20px;
-        }
+*{box-sizing:border-box;margin:0;padding:0}
 
-        .box {
-            max-width: 700px;
-            margin: auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-        }
+.root{
+  padding:1.2rem 0;
+  font-family:var(--font-sans, Arial, Helvetica, sans-serif);
+  color:var(--ui-text);
+}
 
-        textarea {
-            width: 100%;
-            height: 200px;
-            padding: 10px;
-            margin-top: 10px;
-        }
+.split{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  align-items:start;
+}
 
-        button {
-            margin-top: 15px;
-            padding: 10px 15px;
-            background: black;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
-</head>
+.panel{
+  background:var(--ui-bg);
+  border:1px solid var(--ui-border-soft);
+  border-radius:var(--ui-radius);
+  padding:1.15rem;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  box-shadow:var(--ui-shadow);
+}
 
-<body>
-    <div class="box">
-        <h2>Banner Section </h2>
+.panel-title{
+  font-size:14px;
+  font-weight:600;
+  color:var(--ui-text);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  letter-spacing:0.2px;
+}
 
-        <textarea id="input" placeholder="Paste full content here..."></textarea>
+.hint{
+  font-size:11px;
+  color:var(--ui-text-muted);
+  line-height:1.65;
+  background:var(--ui-bg-soft);
+  border:1px solid var(--ui-border-soft);
+  border-radius:var(--ui-radius-sm);
+  padding:10px;
+}
 
-        <button onclick="generateHTML()">Get HTML</button>
+textarea{
+  width:100%;
+  min-height:500px;
+  font-size:12px;
+  font-family:var(--font-mono, Consolas, Monaco, monospace);
+  resize:vertical;
+  border-radius:var(--ui-radius-sm);
+  border:1px solid var(--ui-border);
+  padding:12px;
+  background:var(--ui-bg-soft);
+  color:var(--ui-text);
+  line-height:1.65;
+  transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
 
-        <h3>Output</h3>
-        <textarea id="output" readonly></textarea>
-    </div>
-    <div class="box">
-        <h2>Section 2 - Braces Cost </h2>
+textarea:focus,
+.img-fields input:focus{
+  outline:none;
+  border-color:var(--ui-brand);
+  box-shadow:0 0 0 3px rgba(10, 40, 73, 0.12);
+  background:var(--ui-bg);
+}
 
-        <textarea id="input2" placeholder="Paste content like:
-    
-    How Much Do Braces Cost in Los Angeles? (H2)
-    
-    Paragraph here..."></textarea>
+.actions{display:flex;gap:10px;flex-wrap:wrap;padding-top:2px}
 
-        <button onclick="generateSection2()">Get HTML</button>
+button{
+  font-size:12px;
+  font-weight:600;
+  padding:8px 14px;
+  min-height:34px;
+  border-radius:9px;
+  border:1px solid var(--ui-border);
+  background:var(--ui-bg-soft);
+  color:var(--ui-text);
+  cursor:pointer;
+  transition:transform .06s ease, background .2s ease, border-color .2s ease, color .2s ease;
+}
 
-        <h3>Output</h3>
-        <textarea id="output2" readonly></textarea>
-    </div>
-    <div class="box">
-        <h2>Section 3 </h2>
+button:hover{background:var(--ui-bg-soft-2)}
+button:active{transform:translateY(1px)}
 
-        <textarea id="input3" placeholder="Use format:
+button.primary{
+  background:var(--ui-brand);
+  color:#fff;
+  border-color:var(--ui-brand);
+}
 
-        H2: Heading
+button.primary:hover{background:#0d3260}
 
-        P: Paragraph
+.tabs{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  background:var(--ui-bg-soft);
+  border:1px solid var(--ui-border-soft);
+  border-radius:999px;
+  padding:6px;
+}
 
-        H3: Subheading
+.tab{
+  font-size:11px;
+  font-weight:600;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--ui-text-soft);
+  cursor:pointer;
+  white-space:nowrap;
+  transition:all .2s ease;
+}
 
-        LI: Item 1
-        LI: Item 2
+.tab:hover{background:var(--ui-bg)}
 
-        P: Paragraph
+.tab.active{
+  background:var(--ui-brand);
+  color:#fff;
+  border-color:var(--ui-brand);
+}
 
-        CTA: Button text"></textarea>
+.output-block{display:none;flex-direction:column;gap:8px}
+.output-block.visible{display:flex}
 
-        <button onclick="generateSection3()">Get HTML</button>
+pre{
+  background:var(--ui-bg-soft);
+  border:1px solid var(--ui-border-soft);
+  border-radius:var(--ui-radius-sm);
+  padding:12px;
+  font-size:11px;
+  font-family:var(--font-mono, Consolas, Monaco, monospace);
+  white-space:pre-wrap;
+  word-break:break-word;
+  color:var(--ui-text);
+  max-height:390px;
+  overflow-y:auto;
+  line-height:1.7;
+}
 
-        <h3>Output</h3>
-        <textarea id="output3" readonly></textarea>
-    </div>
-    <script>
-        function generateHTML() {
-            let input = document.getElementById("input").value.trim();
+.badge{
+  font-size:10px;
+  font-weight:600;
+  padding:3px 8px;
+  border-radius:999px;
+  background:var(--color-background-info, #edf3ff);
+  color:var(--color-text-info, #204a87);
+  border:1px solid rgba(0,0,0,0.06);
+}
 
-            // Split by empty line
-            let parts = input.split(/\n\s*\n/);
+.badge.ok{
+  background:var(--color-background-success, #eaf8ee);
+  color:var(--color-text-success, #1d6f42);
+}
 
-            let heading = parts[0] || "";
-            let desc = parts[1] || "";
-            let button = parts[2] || "";
+.badge.warn{
+  background:var(--color-background-warning, #fff8e8);
+  color:var(--color-text-warning, #946200);
+}
 
-            // Replace price with span
-            desc = desc.replace(
-                /\$\d+/g,
-                '<span class="smileadvantage__single_price_text"></span>',
-            );
+.copy-btn{font-size:11px;padding:4px 10px;margin-left:auto}
 
-            const html = `<h1>${heading} </h1>
-        <p>
-        ${desc}
-        </p>
-        <a href="https://alignerco.com/pages/survey" class="e-consultation-header-button city-button" style="font-weight: 600;">${button}
-        </a>`;
+.row-lbl{
+  font-size:12px;
+  font-weight:600;
+  color:var(--ui-text);
+  display:flex;
+  align-items:center;
+}
 
-            document.getElementById("output").value = html;
-        }
+.img-fields{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:10px;
+  background:var(--ui-bg-soft);
+  border-radius:var(--ui-radius-sm);
+  border:1px solid var(--ui-border-soft);
+}
 
-    </script>
-    <script>
-        function generateSection2() {
-            let input = document.getElementById("input2").value.trim();
+.img-fields label{font-size:11px;color:var(--ui-text-soft);margin-bottom:2px}
 
-            // Split by empty line
-            let parts = input.split(/\n\s*\n/);
+.img-fields input{
+  width:100%;
+  font-size:11px;
+  padding:7px 9px;
+  border-radius:8px;
+  border:1px solid var(--ui-border);
+  background:var(--ui-bg);
+  color:var(--ui-text);
+}
 
-            // Clean heading (remove H2 if user writes it)
-            let heading = (parts[0] || "").replace(/\(.*?\)/g, "").trim();
-            let desc = parts[1] || "";
+.img-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 
-            const html = `<div class="braces-card">
-      <h2>
-          ${heading}
-      </h2>
-    
-      <div class="braces-content" id="bracesContent">
-          ${desc}
+.section-divider{
+  font-size:11px;
+  font-weight:600;
+  color:var(--ui-text-soft);
+  border-top:1px solid var(--ui-border-soft);
+  padding-top:10px;
+  margin-top:2px;
+}
+
+@media (max-width: 980px){
+  .split{grid-template-columns:1fr}
+  textarea{min-height:360px}
+  pre{max-height:320px}
+}
+</style>
+
+<div class="root">
+  <div class="split">
+
+    <div class="panel">
+      <div class="panel-title">Plain text input <span class="badge" id="statusBadge">waiting</span></div>
+      <p class="hint">Paste all sections. Script detects SECTION 2, SECTION 3, SECTION 6, SECTION 8, SECTION 9, and SECTION 10 delimiters. CTA goes on its own line after "CTA".</p>
+      <textarea id="inputText" placeholder="Braces Cost in Minneapolis, MN (H1)
+Paragraph text here...
+CTA
+See if You're Eligible
+
+SECTION 2:
+How Much Do Braces Cost in Minneapolis? (H2)
+Paragraph one...
+
+Paragraph two...
+CTA
+Get Started Now
+
+SECTION 3:
+Types of Braces Available & Their Cost Comparison (H2)
+Description line.
+● ALIGNERCO At-Home Clear Aligners: Description here.
+Price range: $725 to $925
+..."></textarea>
+
+      <div class="section-divider">Images</div>
+      <div class="img-fields">
+        <div>
+          <label>Section 1 — Hero banner image URL</label>
+          <input id="img_s1" placeholder="https://cdn.shopify.com/..." />
+        </div>
+        <div style="margin-top:6px">
+          <label>Section 3 — Hover card images (one URL per line, in order of bullet items)</label>
+          <textarea id="img_s3" style="min-height:90px;font-size:11px;padding:6px 8px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);width:100%;resize:vertical;font-family:var(--font-mono);line-height:1.6" placeholder="https://cdn.shopify.com/.../alignerco.png
+https://cdn.shopify.com/.../metal.png
+https://cdn.shopify.com/.../ceramic.png
+https://cdn.shopify.com/.../lingual.png
+https://cdn.shopify.com/.../invisible.png"></textarea>
+        </div>
+        <div style="margin-top:6px">
+          <label>Section 6 — Best choice image URL</label>
+          <input id="img_s6" placeholder="https://cdn.shopify.com/..." />
+        </div>
+        <div style="margin-top:6px">
+          <label>Section 8 — Partner clinic image URL</label>
+          <input id="img_s8" placeholder="https://cdn.shopify.com/..." />
+        </div>
       </div>
-    
-      <button type="button" class="braces-read-more" id="bracesReadMore" aria-expanded="false">
-          Read more
-      </button>
-    
-      <a href="https://alignerco.com/pages/survey" class="braces-btn primary-button">Get Started with ALIGNERCO</a>
-    </div>`;
 
-            document.getElementById("output2").value = html;
-        }
-    </script>
-    <script>
-        function generateSection3() {
-            let input = document.getElementById("input3").value.trim();
+      <div class="actions">
+        <button class="primary" onclick="convert()">Convert to HTML</button>
+        <button onclick="document.getElementById('inputText').value=''">Clear</button>
+        <button onclick="loadSample()">Load sample</button>
+      </div>
+    </div>
 
-            let lines = input.split("\n");
+    <div class="panel" id="outputPanel">
+      <div class="panel-title">Generated HTML</div>
+      <div class="tabs" id="tabs">
+        <div class="tab active" data-tab="s1" onclick="switchTab('s1')">Section 1</div>
+        <div class="tab" data-tab="s2" onclick="switchTab('s2')">Section 2</div>
+        <div class="tab" data-tab="s3" onclick="switchTab('s3')">Section 3</div>
+        <div class="tab" data-tab="s6" onclick="switchTab('s6')">Section 6</div>
+        <div class="tab" data-tab="s8" onclick="switchTab('s8')">Section 8</div>
+        <div class="tab" data-tab="s9" onclick="switchTab('s9')">Section 9</div>
+        <div class="tab" data-tab="s10" onclick="switchTab('s10')">Section 10</div>
+        <div class="tab" data-tab="all" onclick="switchTab('all')">All</div>
+      </div>
 
-            let h2 = "", p1 = "", h3 = "", p2 = "", cta = "";
-            let listItems = [];
+      <div id="out-s1" class="output-block visible">
+        <div class="row-lbl">Section 1 — Hero banner <button class="copy-btn" onclick="copyBlock('pre-s1')">Copy</button></div>
+        <pre id="pre-s1">Output will appear here after conversion.</pre>
+      </div>
+      <div id="out-s2" class="output-block">
+        <div class="row-lbl">Section 2 — Braces card <button class="copy-btn" onclick="copyBlock('pre-s2')">Copy</button></div>
+        <pre id="pre-s2">Output will appear here after conversion.</pre>
+      </div>
+      <div id="out-s3" class="output-block">
+        <div class="row-lbl">Section 3 — Comparison bars <button class="copy-btn" onclick="copyBlock('pre-s3')">Copy</button></div>
+        <pre id="pre-s3">Output will appear here after conversion.</pre>
+      </div>
+      <div id="out-s6" class="output-block">
+        <div class="row-lbl">Section 6 — Best choice <button class="copy-btn" onclick="copyBlock('pre-s6')">Copy</button></div>
+        <pre id="pre-s6">Output will appear here after conversion.</pre>
+      </div>
+      <div id="out-s8" class="output-block">
+        <div class="row-lbl">Section 8 — Nearby partner clinic <button class="copy-btn" onclick="copyBlock('pre-s8')">Copy</button></div>
+        <pre id="pre-s8">Output will appear here after conversion.</pre>
+      </div>
+      <div id="out-s9" class="output-block">
+        <div class="row-lbl">Section 9 — Eligibility <button class="copy-btn" onclick="copyBlock('pre-s9')">Copy</button></div>
+        <pre id="pre-s9">Output will appear here after conversion.</pre>
+      </div>
+      <div id="out-s10" class="output-block">
+        <div class="row-lbl">Section 10 — FAQs <button class="copy-btn" onclick="copyBlock('pre-s10')">Copy</button></div>
+        <pre id="pre-s10">Output will appear here after conversion.</pre>
+      </div>
+      <div id="out-all" class="output-block">
+        <div class="row-lbl">All sections combined <button class="copy-btn" onclick="copyBlock('pre-all')">Copy</button></div>
+        <pre id="pre-all">Output will appear here after conversion.</pre>
+      </div>
+    </div>
 
-            lines.forEach(line => {
-                line = line.trim();
+  </div>
+</div>
 
-                if (line.startsWith("H2:")) h2 = line.replace("H2:", "").trim();
-                else if (line.startsWith("H3:")) h3 = line.replace("H3:", "").trim();
-                else if (line.startsWith("P:") && !p1) p1 = line.replace("P:", "").trim();
-                else if (line.startsWith("P:")) p2 = line.replace("P:", "").trim();
-                else if (line.startsWith("LI:")) listItems.push(line.replace("LI:", "").trim());
-                else if (line.startsWith("CTA:")) cta = line.replace("CTA:", "").trim();
-            });
+<script>
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===name)});
+  document.querySelectorAll('.output-block').forEach(function(b){b.classList.remove('visible')});
+  document.getElementById('out-'+name).classList.add('visible');
+}
+function copyBlock(preId){
+  var text=document.getElementById(preId).textContent;
+  navigator.clipboard.writeText(text).then(function(){
+    var btn=document.querySelector('[onclick="copyBlock(\''+preId+'\')"]');
+    var orig=btn.textContent;btn.textContent='Copied!';
+    setTimeout(function(){btn.textContent=orig},1500);
+  });
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-            let liHTML = listItems.map(item => `
-            <li><span class="best-choice-city-check"><img
-                src="https://cdn.shopify.com/s/files/1/0685/4115/3567/files/Group_1000005758_e9a2c843-8441-428e-a5ea-a77c09d3c0ec.png?v=1773406172"
-                alt=""></span>${item}</li>`).join("");
+function parseInput(raw){
+  var lines=raw.split('\n').map(function(l){return l.trim()});
+  var s1=[],s2=[],s3=[],s6=[],s8=[],s9=[],s10=[];
+  var mode='s1';
+  var hasExplicitSection=lines.some(function(l){return /^SECTION\s*\d+[:\s]/i.test(l)});
+  var hasExplicitSection10=lines.some(function(l){return /^SECTION\s*10[:\s]/i.test(l)});
+  var faqNumberedCount=lines.filter(function(l){return /^\d+\.\s+/.test(l)}).length;
 
-            const html = `<div class="best-choice-city-wapper">
-            <div class="best-choice-city-left">
-                <h2>${h2}</h2>
+  // If user starts with "content ...", treat that block as section 6.
+  // If input looks like FAQ-only content with no SECTION marker, route to section 10.
+  for(var n=0;n<lines.length;n++){
+    if(lines[n]){
+      if(/^content\s+/i.test(lines[n])){
+        mode='s6';
+      }else if(!hasExplicitSection && (/^FAQs?$/i.test(lines[n]) || /^Frequently Asked Questions$/i.test(lines[n]) || faqNumberedCount>=2)){
+        mode='s10';
+      }
+      break;
+    }
+  }
 
-                <p>${p1}</p>
+  for(var i=0;i<lines.length;i++){
+    var l=lines[i];
+    if(/^SECTION\s*1[:\s]/i.test(l)){mode='s1';continue}
+    if(/^SECTION\s*2[:\s]/i.test(l)){mode='s2';continue}
+    if(/^SECTION\s*3[:\s]/i.test(l)){mode='s3';continue}
+    if(/^SECTION\s*6[:\s]/i.test(l)){mode='s6';continue}
+    if(/^SECTION\s*8[:\s]/i.test(l)){mode='s8';continue}
+    if(/^SECTION\s*9[:\s]/i.test(l)){mode='s9';continue}
+    if(/^SECTION\s*10[:\s]/i.test(l)){mode='s10';continue}
 
-                <div class="city-img-best-choice">
-                    <img src="https://cdn.shopify.com/s/files/1/0685/4115/3567/files/Mask_group_14.png?v=1773406123" alt="">
-                </div>
-            </div>
+    // If SECTION 10 marker is missing, detect FAQ start and redirect to section 10.
+    if(!hasExplicitSection10 && mode!=='s10'){
+      if(/^FAQs?$/i.test(l) || /^Frequently Asked Questions$/i.test(l)){
+        mode='s10';
+      }else if(mode==='s9' && /^\d+\.\s+.*\?$/.test(l)){
+        mode='s10';
+      }
+    }
 
-            <div class="best-choice-city-card">
-                <h3>${h3}</h3>
+    if(/^content\s+/i.test(l) && mode==='s6'){
+      l=l.replace(/^content\s+/i,'').trim();
+    }
 
-            <ul class="best-choice-city-features">
-                ${liHTML}
-            </ul>
+    if(mode==='s1')s1.push(l);
+    else if(mode==='s2')s2.push(l);
+    else if(mode==='s3')s3.push(l);
+    else if(mode==='s6')s6.push(l);
+    else if(mode==='s8')s8.push(l);
+    else if(mode==='s9')s9.push(l);
+    else if(mode==='s10')s10.push(l);
+  }
+  return{
+    s1:parseS1(s1),
+    s2:parseS2(s2),
+    s3:parseS3(s3),
+    s6:parseS6(s6),
+    s8:parseS8(s8),
+    s9:parseS9(s9),
+    s10:parseS10(s10)
+  };
+}
 
-            <p>${p2}</p>
+function parseS1(lines){
+  var heading='',paragraphs=[],cta='';
+  var headingDone=false,ctaMode=false;
+  for(var i=0;i<lines.length;i++){
+    var l=lines[i];if(!l)continue;
+    if(!headingDone){heading=l.replace(/\s*\(H[12]\)\s*/gi,'').trim();headingDone=true;continue}
+    if(/^CTA\s*$/i.test(l)){ctaMode=true;continue}
+    if(ctaMode&&!cta){cta=l;ctaMode=false;continue}
+    paragraphs.push(l);
+  }
+  return{heading:heading,paragraphs:paragraphs,cta:cta};
+}
 
-            <a href="https://alignerco.com/pages/survey" class="best-choice-city-btn">${cta}</a>
-            </div>
-            </div>`;
+function parseS2(lines){
+  var heading='',paragraphs=[],cta='';
+  var headingDone=false,ctaMode=false,buf='';
+  for(var i=0;i<lines.length;i++){
+    var l=lines[i];
+    if(!headingDone&&l){heading=l.replace(/\s*\(H[12]\)\s*/gi,'').trim();headingDone=true;continue}
+    if(/^CTA\s*$/i.test(l)){ctaMode=true;if(buf.trim()){paragraphs.push(buf.trim());buf=''}continue}
+    if(ctaMode&&!cta){cta=l;ctaMode=false;continue}
+    if(!l){if(buf.trim()){paragraphs.push(buf.trim());buf=''}}
+    else{buf+=(buf?' ':'')+l}
+  }
+  if(buf.trim())paragraphs.push(buf.trim());
+  return{heading:heading,paragraphs:paragraphs,cta:cta};
+}
 
-            document.getElementById("output3").value = html;
-        }
-    </script>
+function parseS3(lines){
+  var heading='',description='',items=[];
+  var headingDone=false,descDone=false,cur=null;
+  for(var i=0;i<lines.length;i++){
+    var l=lines[i];if(!l)continue;
+    if(!headingDone){heading=l.replace(/\s*\(H[12]\)\s*/gi,'').trim();headingDone=true;continue}
+    if(!descDone&&!l.match(/^[●•\-\*]/)&&!l.match(/^Price range/i)){description+=(description?' ':'')+l;continue}
+    if(l.match(/^[●•\-\*]/)){
+      descDone=true;
+      if(cur)items.push(cur);
+      var parts=l.replace(/^[●•\-\*]\s*/,'').split(':');
+      cur={name:parts[0].trim(),description:parts.slice(1).join(':').trim(),price:''};
+      continue;
+    }
+    if(/^Price range[:\s]/i.test(l)&&cur){cur.price=l.replace(/^Price range[:\s]*/i,'').trim();continue}
+    if(cur&&l)cur.description+=(cur.description?' ':'')+l;
+  }
+  if(cur)items.push(cur);
+  return{heading:heading,description:description.trim(),items:items};
+}
 
-</body>
+function parseParagraphCta(lines){
+  var heading='',paragraphs=[],cta='';
+  var headingDone=false,ctaMode=false,buf='';
+  for(var i=0;i<lines.length;i++){
+    var l=lines[i];
+    if(!headingDone&&l){heading=l.replace(/\s*\(H[12]\)\s*/gi,'').trim();headingDone=true;continue}
+    if(/^CTA\s*$/i.test(l)){ctaMode=true;if(buf.trim()){paragraphs.push(buf.trim());buf=''}continue}
+    if(ctaMode&&!cta){cta=l;ctaMode=false;continue}
+    if(!l){if(buf.trim()){paragraphs.push(buf.trim());buf=''}}
+    else{buf+=(buf?' ':'')+l}
+  }
+  if(buf.trim())paragraphs.push(buf.trim());
+  return{heading:heading,paragraphs:paragraphs,cta:cta};
+}
 
-</html>
+function parseS6(lines){
+  var heading='';
+  var intro='';
+  var cardHeading='';
+  var features=[];
+  var closing='';
+  var cta='';
+  var i=0;
+  var bodyLines=[];
+
+  function splitParagraphChunks(rawLines){
+    var chunks=[];
+    var current=[];
+    for(var k=0;k<rawLines.length;k++){
+      var ln=rawLines[k];
+      if(!ln){
+        if(current.length){chunks.push(current.join(' ').trim());current=[]}
+        continue;
+      }
+      current.push(ln);
+    }
+    if(current.length){chunks.push(current.join(' ').trim())}
+    return chunks.filter(Boolean);
+  }
+
+  while(i<lines.length && !lines[i])i++;
+  if(i<lines.length){heading=lines[i].replace(/\s*\(H[12]\)\s*/gi,'').trim();i++}
+
+  while(i<lines.length){
+    var l=lines[i];
+    if(!l){i++;continue}
+    if(/\(H3\)/i.test(l)){cardHeading=l.replace(/\s*\(H3\)\s*/gi,'').trim();i++;break}
+    if(/^CTA\s*$/i.test(l)){i++;break}
+    intro+=(intro?' ':'')+l;
+    i++;
+  }
+
+  while(i<lines.length){
+    var f=lines[i];
+    if(/^CTA\s*$/i.test(f)){i++;break}
+    bodyLines.push(f);
+    i++;
+  }
+
+  var chunks=splitParagraphChunks(bodyLines);
+  if(chunks.length>1){
+    closing=chunks[chunks.length-1];
+    features=chunks.slice(0,chunks.length-1).map(function(item){
+      return item.replace(/^[*•\-]\s*/,'').trim();
+    }).filter(Boolean);
+  }else if(chunks.length===1){
+    features=[chunks[0].replace(/^[*•\-]\s*/,'').trim()];
+  }
+
+  while(i<lines.length){
+    if(lines[i]){cta=lines[i];break}
+    i++;
+  }
+
+  if(!cardHeading){
+    cardHeading='Why ALIGNERCO Works for {{ page.metafields.custom.city_name }}:';
+  }
+
+  return{
+    heading:heading,
+    intro:intro,
+    cardHeading:cardHeading,
+    features:features,
+    closing:closing,
+    cta:cta
+  };
+}
+
+function parseS8(lines){
+  return parseParagraphCta(lines);
+}
+
+function parseS9(lines){
+  return parseParagraphCta(lines);
+}
+
+function parseS10(lines){
+  var items=[];
+  var q='';
+  var a='';
+
+  for(var i=0;i<lines.length;i++){
+    var l=lines[i];
+    if(!l){
+      if(q&&a){items.push({question:q,answer:a.trim()});q='';a=''}
+      continue;
+    }
+    if(/^FAQs?$/i.test(l)){continue}
+    if(/^\d+\./.test(l)){
+      if(q&&a){items.push({question:q,answer:a.trim()})}
+      q=l.replace(/^\d+\.\s*/,'').trim();
+      a='';
+      continue;
+    }
+    if(q){a+=(a?' ':'')+l}
+  }
+  if(q&&a){items.push({question:q,answer:a.trim()})}
+
+  return{items:items};
+}
+
+var barClassMap=['alignerco','metal','ceramic','lingual','invisible'];
+
+function buildS1(d,imgUrl){
+  var img=imgUrl||'{{ page.metafields.custom.li_main_image.value | img_url: "2048x2048" }}';
+  var h='<section class="city-hero-banner-1">\n';
+  if(imgUrl){
+    h='<!-- inline style override for this city -->\n<style>.city-hero-banner-1{background-image:url(\''+esc(img)+'\')}</style>\n\n'+h;
+  }
+  h+='  <div class="page-width">\n';
+  h+='    <div class="city-hero-banner-overlay">\n';
+  h+='      <h1>'+esc(d.heading)+'</h1>\n';
+  d.paragraphs.forEach(function(p){if(p)h+='      <p>'+esc(p)+'</p>\n'});
+  if(d.cta)h+='      <a href="https://alignerco.com/pages/survey" class="e-consultation-header-button city-button">'+esc(d.cta)+'</a>\n';
+  h+='    </div>\n  </div>\n</section>';
+  return h;
+}
+
+function buildS2(d){
+  var h='<section class="braces-section">\n  <div class="page-width">\n    <div class="braces-container">\n';
+  h+='      <div class="braces-image">\n        <img\n';
+  h+='          src="https://cdn.shopify.com/s/files/1/0685/4115/3567/files/Mask_group_9_4f4a11fc-b572-4df9-9340-ae4db2155d5b.png?v=1773303983"\n';
+  h+='          alt="Clear Aligners"\n        />\n      </div>\n';
+  h+='      <div class="braces-card">\n';
+  h+='        <h2>'+esc(d.heading)+'</h2>\n';
+  h+='        <div class="braces-content" id="bracesContent">\n';
+  d.paragraphs.forEach(function(p){if(p)h+='          <p>'+esc(p)+'</p>\n'});
+  h+='        </div>\n';
+  h+='        <button type="button" class="braces-read-more" id="bracesReadMore" aria-expanded="false">Read more</button>\n';
+  if(d.cta)h+='        <a href="https://alignerco.com/pages/survey" class="braces-btn primary-button">'+esc(d.cta)+'</a>\n';
+  h+='      </div>\n    </div>\n  </div>\n</section>';
+  return h;
+}
+
+function buildS3(d,imgUrls){
+  var h='<section class="braces-comparison">\n  <div class="page-width">\n    <div class="braces-wrapper">\n';
+  h+='      <div class="graph-header">\n        <h2>'+esc(d.heading)+'</h2>\n';
+  if(d.description)h+='        <p>'+esc(d.description)+'</p>\n';
+  h+='      </div>\n      <div class="bar-graph">\n';
+  d.items.forEach(function(item,idx){
+    var barClass=barClassMap[idx]||'bar-item-'+idx;
+    var imgUrl=imgUrls[idx]||'';
+    h+='        <div class="bar-item" data-hover-image="'+esc(imgUrl)+'">\n';
+    h+='          <div class="hover-card">\n';
+    if(imgUrl){
+      h+='            <div class="hover-card-img-wrap">\n';
+      h+='              <img src="'+esc(imgUrl)+'" alt="'+esc(item.name)+'">\n';
+      h+='            </div>\n';
+    }
+    h+='            <div class="hover-card-body">\n';
+    h+='              <h4>'+esc(item.name)+'</h4>\n';
+    if(item.description)h+='              <p>'+esc(item.description)+'</p>\n';
+    h+='            </div>\n          </div>\n';
+    h+='          <div class="bar '+barClass+'">\n';
+    h+='            <span>Price range<br><strong>'+esc(item.price)+'</strong></span>\n';
+    h+='          </div>\n';
+    h+='          <p style="text-align: center;">'+esc(item.name)+'</p>\n';
+    h+='        </div>\n';
+  });
+  h+='      </div>\n    </div>\n  </div>\n</section>';
+  return h;
+}
+
+function buildS6(d,imgUrl){
+  var checkIcon='https://cdn.shopify.com/s/files/1/0685/4115/3567/files/Group_1000005758_e9a2c843-8441-428e-a5ea-a77c09d3c0ec.png?v=1773406172';
+  var h='<section class="best-choice-city">\n';
+  h+='  <div class="page-width">\n';
+  h+='    <div class="best-choice-city-wapper">\n';
+  h+='      <div class="best-choice-city-left">\n';
+  h+='        <h2>'+esc(d.heading)+'</h2>\n';
+  if(d.intro)h+='        <p>'+esc(d.intro)+'</p>\n';
+  if(imgUrl){
+    h+='        <div class="city-img-best-choice">\n';
+    h+='          <img src="'+esc(imgUrl)+'" alt="Best Choice">\n';
+    h+='        </div>\n';
+  }
+  h+='      </div>\n';
+  h+='      <div class="best-choice-city-card">\n';
+  h+='        <h3>'+esc(d.cardHeading)+'</h3>\n';
+  h+='        <ul class="best-choice-city-features">\n';
+  d.features.forEach(function(item){
+    if(item)h+='          <li><span class="best-choice-city-check"><img src="'+esc(checkIcon)+'" alt="{{ page.metafields.custom.city_name }}"></span>'+esc(item)+'</li>\n';
+  });
+  h+='        </ul>\n';
+  if(d.closing)h+='        <p>'+esc(d.closing)+'</p>\n';
+  if(d.cta)h+='        <a href="https://alignerco.com/pages/survey" class="best-choice-city-btn">'+esc(d.cta)+'</a>\n';
+  h+='      </div>\n';
+  h+='    </div>\n';
+  h+='  </div>\n';
+  h+='</section>';
+  return h;
+}
+
+function buildS8(d,imgUrl){
+  var h='<section class="nearby-partner-clinic-city">\n';
+  h+='  <div class="page-width">\n';
+  h+='    <div class="nearby-partner-clinic-wapper">\n';
+  if(imgUrl){
+    h+='      <div class="city-img-partner-clinic">\n';
+    h+='        <img src="'+esc(imgUrl)+'" alt="Nearby Partner Clinic">\n';
+    h+='      </div>\n';
+  }
+  h+='      <div class="nearby-partner-clinic-card">\n';
+  h+='        <h2>'+esc(d.heading)+'</h2>\n';
+  d.paragraphs.forEach(function(p){if(p)h+='        <p>'+esc(p)+'</p>\n'});
+  if(d.cta)h+='        <a href="https://alignerco.com/pages/survey" class="nearby-partner-clinic-btn">'+esc(d.cta)+'</a>\n';
+  h+='      </div>\n';
+  h+='    </div>\n';
+  h+='  </div>\n';
+  h+='</section>';
+  return h;
+}
+
+function buildS9(d){
+  var h='<section class="eligibility-wrap">\n';
+  h+='  <div class="page-width">\n';
+  h+='    <div class="eligibility-wrapper">\n';
+  h+='      <div class="eligibility-content">\n';
+  h+='        <h2>'+esc(d.heading)+'</h2>\n';
+  d.paragraphs.forEach(function(p){if(p)h+='        <p>'+esc(p)+'</p>\n'});
+  if(d.cta)h+='        <a href="https://alignerco.com/pages/survey" class="eligibility-btn">'+esc(d.cta)+'</a>\n';
+  h+='      </div>\n';
+  h+='    </div>\n';
+  h+='  </div>\n';
+  h+='</section>';
+  return h;
+}
+
+function buildS10(d){
+  var h='<section class="faq-section">\n';
+  h+='  <div itemscope="" itemtype="https://schema.org/FAQPage" class="page-width">\n';
+  h+='    <div class="section-title">\n';
+  h+='      <h2>Frequently Asked Questions</h2>\n';
+  h+='    </div>\n';
+  h+='    <div id="accordion_block" class="accordion">\n';
+  d.items.forEach(function(item, idx){
+    h+='      <!-- FAQ '+(idx+1)+' -->\n';
+    h+='      <div itemscope="" itemprop="mainEntity" itemtype="https://schema.org/Question" class="accordion-item">\n';
+    h+='        <h2 itemprop="name" class="accordion-title">'+esc(item.question)+'</h2>\n';
+    h+='        <div itemscope="" itemprop="acceptedAnswer" itemtype="https://schema.org/Answer" class="accordion-content">\n';
+    h+='          <p itemprop="text">'+esc(item.answer)+'</p>\n';
+    h+='        </div>\n';
+    h+='      </div>\n';
+  });
+  h+='    </div>\n';
+  h+='  </div>\n';
+  h+='</section>';
+  return h;
+}
+
+function convert(){
+  var raw=document.getElementById('inputText').value.trim();
+  if(!raw){
+    document.getElementById('statusBadge').textContent='no input';
+    document.getElementById('statusBadge').className='badge warn';
+    return;
+  }
+  var s1ImgUrl=document.getElementById('img_s1').value.trim();
+  var s3ImgRaw=document.getElementById('img_s3').value.trim();
+  var s6ImgUrl=document.getElementById('img_s6').value.trim();
+  var s8ImgUrl=document.getElementById('img_s8').value.trim();
+  var s3Imgs=s3ImgRaw?s3ImgRaw.split('\n').map(function(u){return u.trim()}).filter(Boolean):[];
+
+  var data=parseInput(raw);
+  var s1=buildS1(data.s1,s1ImgUrl);
+  var s2=buildS2(data.s2);
+  var s3=buildS3(data.s3,s3Imgs);
+  var s6=data.s6.heading?buildS6(data.s6,s6ImgUrl):'';
+  var s8=data.s8.heading?buildS8(data.s8,s8ImgUrl):'';
+  var s9=data.s9.heading?buildS9(data.s9):'';
+  var s10=data.s10.items.length?buildS10(data.s10):'';
+  var all=[s1,s2,s3,s6,s8,s9,s10].filter(Boolean).join('\n\n');
+
+  document.getElementById('pre-s1').textContent=s1;
+  document.getElementById('pre-s2').textContent=s2;
+  document.getElementById('pre-s3').textContent=s3;
+  document.getElementById('pre-s6').textContent=s6||'No Section 6 detected';
+  document.getElementById('pre-s8').textContent=s8||'No Section 8 detected';
+  document.getElementById('pre-s9').textContent=s9||'No Section 9 detected';
+  document.getElementById('pre-s10').textContent=s10||'No Section 10 detected';
+  document.getElementById('pre-all').textContent=all;
+  document.getElementById('statusBadge').textContent='done';
+  document.getElementById('statusBadge').className='badge ok';
+  switchTab('s1');
+}
+
+function loadSample(){
+  document.getElementById('inputText').value=`Braces Cost in Minneapolis, MN (H1)
+Achieving a selfie-ready smile in Minneapolis doesn't have to be expensive. ALIGNERCO Clear Aligners offer a discreet and cost-effective teeth straightening solution to a perfect smile for just $725.
+CTA
+See if You're Eligible
+
+
+SECTION 2:
+How Much Do Braces Cost in Minneapolis, MN? (H2)
+Living in Minneapolis means enjoying a vibrant culture. In a city with high clinical overhead, the typical braces often end up being much more expensive for patients. Depending on your case complexity, local orthodontists can charge anywhere between $3,500 and $8,000 for traditional or transparent braces.
+
+On the other hand, ALIGNERCO Clear Aligners offer a convenient at-home alternative starting at just $725. By completing treatment remotely and reducing the need for frequent in-office visits, residents can manage costs more easily while still pursuing a straighter smile.
+CTA
+Get Started Now
+
+
+SECTION 3:
+Types of Braces Available & Their Cost Comparison (H2)
+There are several methods to address dental alignment. Every method varies in visibility, comfort, and price.
+● ALIGNERCO At-Home Clear Aligners: A remote treatment option using custom plastic trays for a fraction of the traditional cost.
+Price range: $725 to $925
+● Traditional Metal Braces: It's the most common teeth-straightening method using stainless steel brackets and wires.
+Price range: $3,000 to $7,000
+● Ceramic or Clear Braces: These are similar to metal braces but use tooth-colored materials for discretion.
+Price range: $4,000 to $8,000
+● Lingual Braces: Braces that are placed on the back of the teeth, making them completely hidden from the front.
+Price range: $5,000 to $12,000
+● In-Office Aligners (Invisible Braces): Nearly invisible clear trays, provided and monitored under clinical supervision.
+Price range: $4,000 to $8,000`;
+  document.getElementById('img_s1').value='https://cdn.shopify.com/s/files/1/0685/4115/3567/files/minneapolis-banner.jpg';
+  document.getElementById('img_s3').value=`https://cdn.shopify.com/s/files/1/0685/4115/3567/files/alignerco.png
+https://cdn.shopify.com/s/files/1/0685/4115/3567/files/metal.png
+https://cdn.shopify.com/s/files/1/0685/4115/3567/files/ceramic.png
+https://cdn.shopify.com/s/files/1/0685/4115/3567/files/lingual.png
+https://cdn.shopify.com/s/files/1/0685/4115/3567/files/invisible.png`;
+}
+</script>
