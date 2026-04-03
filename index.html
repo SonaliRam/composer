@@ -262,20 +262,8 @@ Price range: $725 to $925
           <input id="img_s1" placeholder="https://cdn.shopify.com/..." />
         </div>
         <div style="margin-top:6px">
-          <label>Section 3 — Hover card images (one URL per line, in order of bullet items)</label>
-          <textarea id="img_s3" style="min-height:90px;font-size:11px;padding:6px 8px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);width:100%;resize:vertical;font-family:var(--font-mono);line-height:1.6" placeholder="https://cdn.shopify.com/.../alignerco.png
-https://cdn.shopify.com/.../metal.png
-https://cdn.shopify.com/.../ceramic.png
-https://cdn.shopify.com/.../lingual.png
-https://cdn.shopify.com/.../invisible.png"></textarea>
-        </div>
-        <div style="margin-top:6px">
           <label>Section 6 — Best choice image URL</label>
           <input id="img_s6" placeholder="https://cdn.shopify.com/..." />
-        </div>
-        <div style="margin-top:6px">
-          <label>Section 8 — Partner clinic image URL</label>
-          <input id="img_s8" placeholder="https://cdn.shopify.com/..." />
         </div>
       </div>
 
@@ -586,6 +574,14 @@ function parseS10(lines){
 }
 
 var barClassMap=['alignerco','metal','ceramic','lingual','invisible'];
+var fixedS3Images=[
+  'https://cdn.shopify.com/s/files/1/0685/4115/3567/files/Mask_group_11_c5029bc2-5c7b-48fc-a569-946a419e1931.png?v=1773316719',
+  'https://cdn.shopify.com/s/files/1/0685/4115/3567/files/Mask_group_18.png?v=1773735703',
+  'https://cdn.shopify.com/s/files/1/0685/4115/3567/files/Mask_group_19.png?v=1773735703',
+  'https://cdn.shopify.com/s/files/1/0685/4115/3567/files/Mask_group_20_79ff84ea-d4de-4add-84e2-bbea9616f168.png?v=1773735703',
+  'https://cdn.shopify.com/s/files/1/0685/4115/3567/files/Mask_group_21_9095181f-4447-4623-99a3-9a389d6b2f62.png?v=1773735704'
+];
+var fixedS8Image='https://cdn.shopify.com/s/files/1/0685/4115/3567/files/Mask_group_15_22733854-08e3-4d40-8169-70c1b5c84cc6.png?v=1774519263';
 
 function buildS1(d,imgUrl){
   var img=imgUrl||'{{ page.metafields.custom.li_main_image.value | img_url: "2048x2048" }}';
@@ -678,14 +674,13 @@ function buildS6(d,imgUrl){
 }
 
 function buildS8(d,imgUrl){
+  var partnerImage=imgUrl||fixedS8Image;
   var h='<section class="nearby-partner-clinic-city">\n';
   h+='  <div class="page-width">\n';
   h+='    <div class="nearby-partner-clinic-wapper">\n';
-  if(imgUrl){
-    h+='      <div class="city-img-partner-clinic">\n';
-    h+='        <img src="'+esc(imgUrl)+'" alt="Nearby Partner Clinic">\n';
-    h+='      </div>\n';
-  }
+  h+='      <div class="city-img-partner-clinic">\n';
+  h+='        <img src="'+esc(partnerImage)+'" alt="Nearby Partner Clinic">\n';
+  h+='      </div>\n';
   h+='      <div class="nearby-partner-clinic-card">\n';
   h+='        <h2>'+esc(d.heading)+'</h2>\n';
   d.paragraphs.forEach(function(p){if(p)h+='        <p>'+esc(p)+'</p>\n'});
@@ -742,29 +737,45 @@ function convert(){
     return;
   }
   var s1ImgUrl=document.getElementById('img_s1').value.trim();
-  var s3ImgRaw=document.getElementById('img_s3').value.trim();
   var s6ImgUrl=document.getElementById('img_s6').value.trim();
-  var s8ImgUrl=document.getElementById('img_s8').value.trim();
-  var s3Imgs=s3ImgRaw?s3ImgRaw.split('\n').map(function(u){return u.trim()}).filter(Boolean):[];
+  var s3Imgs=fixedS3Images.slice();
+  var s8ImgUrl=fixedS8Image;
 
   var data=parseInput(raw);
-  var s1=buildS1(data.s1,s1ImgUrl);
-  var s2=buildS2(data.s2);
-  var s3=buildS3(data.s3,s3Imgs);
-  var s6=data.s6.heading?buildS6(data.s6,s6ImgUrl):'';
-  var s8=data.s8.heading?buildS8(data.s8,s8ImgUrl):'';
-  var s9=data.s9.heading?buildS9(data.s9):'';
-  var s10=data.s10.items.length?buildS10(data.s10):'';
-  var all=[s1,s2,s3,s6,s8,s9,s10].filter(Boolean).join('\n\n');
+  var hasS1=!!(data.s1.heading||data.s1.paragraphs.length||data.s1.cta);
+  var hasS2=!!(data.s2.heading||data.s2.paragraphs.length||data.s2.cta);
+  var hasS3=!!(data.s3.heading||data.s3.description||data.s3.items.length);
+  var hasS6=!!(data.s6.heading||data.s6.intro||data.s6.features.length||data.s6.closing||data.s6.cta);
+  var hasS8=!!(data.s8.heading||data.s8.paragraphs.length||data.s8.cta);
+  var hasS9=!!(data.s9.heading||data.s9.paragraphs.length||data.s9.cta);
+  var hasS10=!!data.s10.items.length;
 
-  document.getElementById('pre-s1').textContent=s1;
-  document.getElementById('pre-s2').textContent=s2;
-  document.getElementById('pre-s3').textContent=s3;
+  var s1=hasS1?buildS1(data.s1,s1ImgUrl):'';
+  var s2=hasS2?buildS2(data.s2):'';
+  var s3=hasS3?buildS3(data.s3,s3Imgs):'';
+  var s6=hasS6?buildS6(data.s6,s6ImgUrl):'';
+  var s8=hasS8?buildS8(data.s8,s8ImgUrl):'';
+  var s9=hasS9?buildS9(data.s9):'';
+  var s10=hasS10?buildS10(data.s10):'';
+
+  var allParts=[];
+  if(hasS1)allParts.push(s1);
+  if(hasS2)allParts.push(s2);
+  if(hasS3)allParts.push(s3);
+  if(hasS6)allParts.push(s6);
+  if(hasS8)allParts.push(s8);
+  if(hasS9)allParts.push(s9);
+  if(hasS10)allParts.push(s10);
+  var all=allParts.join('\n\n');
+
+  document.getElementById('pre-s1').textContent=s1||'No Section 1 detected';
+  document.getElementById('pre-s2').textContent=s2||'No Section 2 detected';
+  document.getElementById('pre-s3').textContent=s3||'No Section 3 detected';
   document.getElementById('pre-s6').textContent=s6||'No Section 6 detected';
   document.getElementById('pre-s8').textContent=s8||'No Section 8 detected';
   document.getElementById('pre-s9').textContent=s9||'No Section 9 detected';
   document.getElementById('pre-s10').textContent=s10||'No Section 10 detected';
-  document.getElementById('pre-all').textContent=all;
+  document.getElementById('pre-all').textContent=all||'No sections detected';
   document.getElementById('statusBadge').textContent='done';
   document.getElementById('statusBadge').className='badge ok';
   switchTab('s1');
@@ -800,10 +811,5 @@ Price range: $5,000 to $12,000
 ● In-Office Aligners (Invisible Braces): Nearly invisible clear trays, provided and monitored under clinical supervision.
 Price range: $4,000 to $8,000`;
   document.getElementById('img_s1').value='https://cdn.shopify.com/s/files/1/0685/4115/3567/files/minneapolis-banner.jpg';
-  document.getElementById('img_s3').value=`https://cdn.shopify.com/s/files/1/0685/4115/3567/files/alignerco.png
-https://cdn.shopify.com/s/files/1/0685/4115/3567/files/metal.png
-https://cdn.shopify.com/s/files/1/0685/4115/3567/files/ceramic.png
-https://cdn.shopify.com/s/files/1/0685/4115/3567/files/lingual.png
-https://cdn.shopify.com/s/files/1/0685/4115/3567/files/invisible.png`;
 }
 </script>
