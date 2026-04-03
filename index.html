@@ -339,6 +339,40 @@ function copyBlock(preId){
   });
 }
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function isCtaLine(line){return /^CTA\s*:?\s*$/i.test(line||'')}
+
+function parsePriceToken(token){
+  var cleaned=(token||'').toLowerCase().replace(/\$/g,'').replace(/,/g,'').trim();
+  if(!cleaned)return null;
+  var m=cleaned.match(/^(\d+(?:\.\d+)?)(k)?$/);
+  if(!m)return null;
+  var n=parseFloat(m[1]);
+  if(!isFinite(n))return null;
+  return m[2]?n*1000:n;
+}
+
+function toCompactPriceLabel(value){
+  if(value===null||value===undefined||!isFinite(value))return '';
+  if(value>=1000){
+    var k=value/1000;
+    var txt=Number.isInteger(k)?String(k):k.toFixed(1).replace(/\.0$/,'');
+    return txt+'k';
+  }
+  return String(Math.round(value));
+}
+
+function formatPriceRangeLabel(priceText){
+  var raw=(priceText||'').trim();
+  if(!raw)return raw;
+  var m=raw.match(/^(.+?)\s*(?:to|-|–)\s*(.+)$/i);
+  if(!m)return raw;
+
+  var low=parsePriceToken(m[1]);
+  var high=parsePriceToken(m[2]);
+  if(low===null||high===null)return raw;
+
+  return toCompactPriceLabel(low)+' to '+toCompactPriceLabel(high);
+}
 
 function parseInput(raw){
   var lines=raw.split('\n').map(function(l){return l.trim()});
@@ -409,7 +443,7 @@ function parseS1(lines){
   for(var i=0;i<lines.length;i++){
     var l=lines[i];if(!l)continue;
     if(!headingDone){heading=l.replace(/\s*\(H[12]\)\s*/gi,'').trim();headingDone=true;continue}
-    if(/^CTA\s*$/i.test(l)){ctaMode=true;continue}
+    if(isCtaLine(l)){ctaMode=true;continue}
     if(ctaMode&&!cta){cta=l;ctaMode=false;continue}
     paragraphs.push(l);
   }
@@ -422,7 +456,7 @@ function parseS2(lines){
   for(var i=0;i<lines.length;i++){
     var l=lines[i];
     if(!headingDone&&l){heading=l.replace(/\s*\(H[12]\)\s*/gi,'').trim();headingDone=true;continue}
-    if(/^CTA\s*$/i.test(l)){ctaMode=true;if(buf.trim()){paragraphs.push(buf.trim());buf=''}continue}
+    if(isCtaLine(l)){ctaMode=true;if(buf.trim()){paragraphs.push(buf.trim());buf=''}continue}
     if(ctaMode&&!cta){cta=l;ctaMode=false;continue}
     if(!l){if(buf.trim()){paragraphs.push(buf.trim());buf=''}}
     else{buf+=(buf?' ':'')+l}
@@ -431,18 +465,42 @@ function parseS2(lines){
   return{heading:heading,paragraphs:paragraphs,cta:cta};
 }
 
+function isS3ItemHeader(line){
+  var cleaned=line.replace(/^[●•\-\*]\s*/,'').trim();
+  if(!cleaned || /^Price range[:\s]/i.test(cleaned) || cleaned.indexOf(':')===-1)return false;
+
+  var introLike=/^(your options|there are|types? of|comparison|price range)/i.test(cleaned);
+  if(introLike)return false;
+
+  var left=cleaned.split(':')[0].trim();
+  if(!left)return false;
+
+  // Section 3 item names almost always include braces/aligner terminology.
+  return /(aligner|braces?|lingual|ceramic|traditional|in-office|in office|invisible|clear)/i.test(left);
+}
+
 function parseS3(lines){
   var heading='',description='',items=[];
   var headingDone=false,descDone=false,cur=null;
   for(var i=0;i<lines.length;i++){
     var l=lines[i];if(!l)continue;
     if(!headingDone){heading=l.replace(/\s*\(H[12]\)\s*/gi,'').trim();headingDone=true;continue}
-    if(!descDone&&!l.match(/^[●•\-\*]/)&&!l.match(/^Price range/i)){description+=(description?' ':'')+l;continue}
-    if(l.match(/^[●•\-\*]/)){
+    var isBulletItem=l.match(/^[●•\-\*]/);
+    var isHeaderItem=isS3ItemHeader(l);
+
+    if(!descDone && !isBulletItem && !isHeaderItem && !l.match(/^Price range/i)){
+      description+=(description?' ':'')+l;
+      continue;
+    }
+
+    if(isBulletItem || isHeaderItem){
       descDone=true;
       if(cur)items.push(cur);
-      var parts=l.replace(/^[●•\-\*]\s*/,'').split(':');
-      cur={name:parts[0].trim(),description:parts.slice(1).join(':').trim(),price:''};
+      var clean=l.replace(/^[●•\-\*]\s*/,'').trim();
+      var col=clean.indexOf(':');
+      var itemName=col===-1?clean:clean.slice(0,col).trim();
+      var itemDesc=col===-1?'':clean.slice(col+1).trim();
+      cur={name:itemName,description:itemDesc,price:''};
       continue;
     }
     if(/^Price range[:\s]/i.test(l)&&cur){cur.price=l.replace(/^Price range[:\s]*/i,'').trim();continue}
@@ -458,7 +516,7 @@ function parseParagraphCta(lines){
   for(var i=0;i<lines.length;i++){
     var l=lines[i];
     if(!headingDone&&l){heading=l.replace(/\s*\(H[12]\)\s*/gi,'').trim();headingDone=true;continue}
-    if(/^CTA\s*$/i.test(l)){ctaMode=true;if(buf.trim()){paragraphs.push(buf.trim());buf=''}continue}
+    if(isCtaLine(l)){ctaMode=true;if(buf.trim()){paragraphs.push(buf.trim());buf=''}continue}
     if(ctaMode&&!cta){cta=l;ctaMode=false;continue}
     if(!l){if(buf.trim()){paragraphs.push(buf.trim());buf=''}}
     else{buf+=(buf?' ':'')+l}
@@ -499,14 +557,14 @@ function parseS6(lines){
     var l=lines[i];
     if(!l){i++;continue}
     if(/\(H3\)/i.test(l)){cardHeading=l.replace(/\s*\(H3\)\s*/gi,'').trim();i++;break}
-    if(/^CTA\s*$/i.test(l)){i++;break}
+    if(isCtaLine(l)){i++;break}
     intro+=(intro?' ':'')+l;
     i++;
   }
 
   while(i<lines.length){
     var f=lines[i];
-    if(/^CTA\s*$/i.test(f)){i++;break}
+    if(isCtaLine(f)){i++;break}
     bodyLines.push(f);
     i++;
   }
@@ -622,6 +680,7 @@ function buildS3(d,imgUrls){
   d.items.forEach(function(item,idx){
     var barClass=barClassMap[idx]||'bar-item-'+idx;
     var imgUrl=imgUrls[idx]||'';
+    var displayPrice=formatPriceRangeLabel(item.price);
     h+='        <div class="bar-item" data-hover-image="'+esc(imgUrl)+'">\n';
     h+='          <div class="hover-card">\n';
     if(imgUrl){
@@ -634,7 +693,7 @@ function buildS3(d,imgUrls){
     if(item.description)h+='              <p>'+esc(item.description)+'</p>\n';
     h+='            </div>\n          </div>\n';
     h+='          <div class="bar '+barClass+'">\n';
-    h+='            <span>Price range<br><strong>'+esc(item.price)+'</strong></span>\n';
+    h+='            <span>Price range<br><strong>'+esc(displayPrice)+'</strong></span>\n';
     h+='          </div>\n';
     h+='          <p style="text-align: center;">'+esc(item.name)+'</p>\n';
     h+='        </div>\n';
